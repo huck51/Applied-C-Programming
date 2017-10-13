@@ -2,6 +2,7 @@
 ** server.c -- a stream socket server demo
 */
 
+// EA: Insert header files
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,6 +18,7 @@
 
 #define PORT "7080"  // the port users will be connecting to
 
+// EA:
 #define GET_ROOT "GET / HTTP/1.0"
 #define GET_INFO "GET /info HTTP/1.0"
 #define POST_INFO "POST /info HTTP/1.0"
@@ -114,7 +116,10 @@ int main(void)
   }
 
   printf("server: waiting for connections...\n");
-
+/**
+* EA: Listens for a connection on a socket and waits for someone to make a
+* request
+**/
   while(1) {  // main accept() loop
     sin_size = sizeof their_addr;
     new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
@@ -138,10 +143,26 @@ int main(void)
 
       // LS: loop above until \n\n is sent, signaling the end of an HTTP request
 
+      int option;
+
+      char search[5] = {'P', 'O', 'S', 'T', '\0'};
+      if (strstr(buffer, search)) {
+        option = 1;
+        printf("\nFound\n");
+      }
+
+      char gearch[4] = {'G', 'E', 'T', '\0'};
+      if (strstr(buffer, gearch)) {
+        option = 2;
+        printf("\nFound Get\n");
+      }
       // LS: parse the input and determine what result to send
       close(sockfd); // child doesn't need the listener
       // LS: Send the correct response in JSON format
-      if (send(new_fd, "Hello, world!", 13, 0) == -1)
+
+      // Put in a switch statement
+      
+      if (send(new_fd, "HTTP/1.0 200 OK\n\n<html><head></head><body><h1>Super Yes</h1></body></html>", 75, 0) == -1)
         perror("send");
       close(new_fd);
       exit(0);
@@ -151,3 +172,8 @@ int main(void)
 
   return 0;
 }
+
+/**
+* P makes chrome happy:
+* if (send(new_fd, "HTTP/1.0 200 OK\n\n<html></html>", 31, 0) == -1);
+**/
